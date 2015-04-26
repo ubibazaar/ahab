@@ -40,11 +40,9 @@ public class Ahab implements Runnable {
 
           log.info("Successfully synchronized installations.");
 
-          // FIXME update ports on API side
-          for (Installation installation : installations) {
-            log.info("installation {} has properties {}", installation.getId(),
-                installation.getProperties());
-          }
+          // update ports on API side
+          installations.stream()
+              .forEach(i -> api.updateInstallation(i));
         } catch (Throwable t) {
           log.error(t.getMessage(), t);
         }

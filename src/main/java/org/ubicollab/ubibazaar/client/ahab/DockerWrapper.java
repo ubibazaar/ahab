@@ -7,8 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.ubicollab.ubibazaar.core.Installation;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
@@ -22,7 +20,6 @@ import com.spotify.docker.client.messages.HostConfig;
 @Slf4j
 public class DockerWrapper {
 
-  private static final String PORTS_PROPERTY = "ports";
   private static final String CONTAINER_PREFIX = "ubibazaar_inst_";
   private static final Integer KILL_TIMEOUT = 20;
   private static final String DOCKER_BINDING = "unix:///var/run/docker.sock";
@@ -112,20 +109,13 @@ public class DockerWrapper {
       // start the container
       docker.startContainer(creation.id(), hostConfig);
 
-      log.info("port mappings coming now: ");
-
-      // initialize properties, if they do not exist
-      if (installation.getProperties() == null) {
-        installation.setProperties(HashMultimap.create());
-      }
-
-      // update properties
-      Multimap<String, String> properties = installation.getProperties();
-      properties.removeAll(PORTS_PROPERTY);
+      // set manager feedback
+      StringBuffer sb = new StringBuffer();
       docker.listContainers(ListContainersParam.allContainers()).stream()
           .filter(c -> c.id().equals(creation.id())) // find container
           .flatMap(c -> c.ports().stream()) // find exposed ports
-          .forEach(p -> properties.put(PORTS_PROPERTY, p.toString())); // store ports in properties
+          .forEach(p -> sb.append(p.toString())); // store ports in properties
+      installation.setManagerFeedback(sb.toString());
     }
   }
 

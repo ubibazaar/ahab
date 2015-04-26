@@ -6,6 +6,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
@@ -44,6 +45,14 @@ public class ApiClient {
     return target
         .request(MediaType.APPLICATION_JSON_TYPE)
         .get(new GenericType<Set<Installation>>() {});
+  }
+
+  protected Installation updateInstallation(Installation installation) {
+    return ClientBuilder.newClient()
+        .target(serverAddress)
+        .path("/resources/installation")
+        .request()
+        .post(Entity.entity(installation, MediaType.APPLICATION_JSON), Installation.class);
   }
 
 
