@@ -2,8 +2,8 @@ package org.ubicollab.ubibazaar.client.ahab;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -34,7 +34,7 @@ public class ApiClient {
   }
 
 
-  protected List<Installation> findInstallationsForDevice(Device device) {
+  protected Set<Installation> findInstallationsForDevice(Device device) {
     WebTarget target = ClientBuilder.newClient()
         .target(serverAddress)
         .path("/resources/installation")
@@ -43,7 +43,7 @@ public class ApiClient {
 
     return target
         .request(MediaType.APPLICATION_JSON_TYPE)
-        .get(new GenericType<List<Installation>>() {});
+        .get(new GenericType<Set<Installation>>() {});
   }
 
 

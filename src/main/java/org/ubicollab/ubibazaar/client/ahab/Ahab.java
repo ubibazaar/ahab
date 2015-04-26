@@ -1,6 +1,6 @@
 package org.ubicollab.ubibazaar.client.ahab;
 
-import java.util.List;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,7 +17,7 @@ public class Ahab implements Runnable {
       // set up api client
       ApiClient api = new ApiClient();
       api.setUp();
-      
+
       // set up docker wrapper
       DockerWrapper docker = new DockerWrapper();
 
@@ -27,17 +27,24 @@ public class Ahab implements Runnable {
       for (Device device : manager.getDevices()) {
         try {
           // processing device
-          log.info("Starting: device {} (id={})", device.getName(), device.getId());
+          log.info("Synchronizing installations on device {} (id={})", device.getName(),
+              device.getId());
 
           // look up installations
-          List<Installation> installations = api.findInstallationsForDevice(device);
+          Set<Installation> installations = api.findInstallationsForDevice(device);
 
           // synch installations with docker
-          // this starts whatever is not running 
+          // this starts whatever is not running
           // and stops whatever should not be
           docker.synchronize(installations);
-          
-          log.info("Successfully synchronized device {} (id={})", device.getName(), device.getId());
+
+          log.info("Successfully synchronized installations.");
+
+          // FIXME update ports on API side
+          for (Installation installation : installations) {
+            log.info("installation {} has properties {}", installation.getId(),
+                installation.getProperties());
+          }
         } catch (Throwable t) {
           log.error(t.getMessage(), t);
         }

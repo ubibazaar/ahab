@@ -11,8 +11,10 @@ public class Main {
     ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
 
     // schedule task at fixed rate
-    //DEBUG    exec.scheduleAtFixedRate(new Ahab(), 0, 20, TimeUnit.SECONDS);
+    //FIXME    exec.scheduleAtFixedRate(new Ahab(), 0, 20, TimeUnit.SECONDS);
     exec.schedule(new Ahab(), 0, TimeUnit.SECONDS);
+    
+    //FIXME close exec?
   }
 
 }
