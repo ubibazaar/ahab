@@ -9,15 +9,16 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.ubicollab.ubibazaar.core.Platform;
 
 import com.google.gson.Gson;
 
+@Slf4j
 public class UbibazaarApiClientTest {
   
   private static String serverAddress;
@@ -32,8 +33,6 @@ public class UbibazaarApiClientTest {
     serverAddress = prop.getProperty("server_address");
   }
 
-  Logger logger = LoggerFactory.getLogger(getClass());
-  
   @Test
   public void testPing() {
     WebTarget target = ClientBuilder.newClient()
@@ -46,7 +45,7 @@ public class UbibazaarApiClientTest {
     
     Assert.assertNotNull(response);
     
-    logger.info("Ping response: " + new Gson().toJson(response));
+    log.info("Ping response: " + new Gson().toJson(response));
   }
   
   @Test
@@ -61,6 +60,6 @@ public class UbibazaarApiClientTest {
     
     Assert.assertTrue(!platforms.isEmpty());
     
-    logger.info("Supported platforms: " + new Gson().toJson(platforms));
+    log.info("Supported platforms: " + new Gson().toJson(platforms));
   }
 }
