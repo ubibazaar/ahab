@@ -21,13 +21,13 @@ import org.ubicollab.ubibazaar.core.Manager;
 public class ApiClient {
 
   private String serverAddress;
-  private String managerUUID;
+  private String managerId;
 
   protected Manager getManagerInfo() {
     WebTarget target = ClientBuilder.newClient()
         .target(serverAddress)
         .path("/resources/manager/")
-        .path(managerUUID);
+        .path(managerId);
 
     return target
         .request(MediaType.APPLICATION_JSON_TYPE)
@@ -66,8 +66,8 @@ public class ApiClient {
     serverAddress = prop.getProperty("server_address");
     log.info("Using API on " + serverAddress);
 
-    managerUUID = prop.getProperty("manager_uuid");
-    log.info("This is manager " + managerUUID);
+    managerId = prop.getProperty("manager_uuid");
+    log.info("This is manager " + managerId);
   }
 
 }

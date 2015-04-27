@@ -26,11 +26,11 @@ public class DockerWrapper {
 
   public void synchronize(Set<Installation> installations) {
     try {
-      Set<Long> shouldBeInstalled = installations.stream()
+      Set<String> shouldBeInstalled = installations.stream()
           .map(i -> i.getId())
           .collect(Collectors.toSet());
 
-      Set<Long> areInstalled = findInstalled();
+      Set<String> areInstalled = findInstalled();
 
       if (shouldBeInstalled.equals(areInstalled)) {
         log.info("All installations in sync {}", shouldBeInstalled);
@@ -39,7 +39,7 @@ public class DockerWrapper {
             shouldBeInstalled, areInstalled);
 
         // uninstall whatever is running, but should not
-        for (Long instId : Sets.difference(areInstalled, shouldBeInstalled)) {
+        for (String instId : Sets.difference(areInstalled, shouldBeInstalled)) {
           try {
             uninstall(instId);
             log.info("Uninstalled {}", instId);
@@ -49,7 +49,7 @@ public class DockerWrapper {
         }
 
         // install whatever should be running, but is not
-        for (Long instId : Sets.difference(shouldBeInstalled, areInstalled)) {
+        for (String instId : Sets.difference(shouldBeInstalled, areInstalled)) {
           Installation installation = installations.stream()
               .filter(i -> i.getId().equals(instId))
               .findFirst().get();
@@ -68,13 +68,12 @@ public class DockerWrapper {
     }
   }
 
-  protected Set<Long> findInstalled() throws DockerException, InterruptedException {
+  protected Set<String> findInstalled() throws DockerException, InterruptedException {
     try (DockerClient docker = new DefaultDockerClient(DOCKER_BINDING)) {
       return docker.listContainers(ListContainersParam.allContainers()).stream()
           .flatMap(container -> container.names().stream())
           .filter(x -> x.startsWith("/" + CONTAINER_PREFIX))
           .map(x -> x.replace("/" + CONTAINER_PREFIX, ""))
-          .map(x -> Long.valueOf(x))
           .collect(Collectors.toSet());
     }
   }
@@ -119,7 +118,7 @@ public class DockerWrapper {
     }
   }
 
-  protected void uninstall(Long installationId) throws DockerException, InterruptedException {
+  protected void uninstall(String installationId) throws DockerException, InterruptedException {
     try (DockerClient docker = new DefaultDockerClient(DOCKER_BINDING)) {
       // find the container of this installation
       Container container = docker.listContainers(ListContainersParam.allContainers()).stream()
