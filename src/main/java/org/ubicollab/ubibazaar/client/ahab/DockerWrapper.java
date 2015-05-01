@@ -1,5 +1,6 @@
 package org.ubicollab.ubibazaar.client.ahab;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -8,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ubicollab.ubibazaar.core.Installation;
 
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerClient.ListContainersParam;
@@ -81,7 +83,8 @@ public class DockerWrapper {
   protected void install(Installation installation) throws DockerException, InterruptedException {
     try (DockerClient docker = new DefaultDockerClient(DOCKER_BINDING)) {
       // load app info
-      String image = installation.getApp().getProperties().get("docker_hub_repo");
+      Map<?, ?> props = new Gson().fromJson(installation.getApp().getProperties(), Map.class);
+      String image = (String) props.get("docker_hub_repo");
 
       // pull the image
       docker.pull(image);
@@ -114,7 +117,7 @@ public class DockerWrapper {
           .filter(c -> c.id().equals(creation.id())) // find container
           .flatMap(c -> c.ports().stream()) // find exposed ports
           .forEach(p -> sb.append(p.toString())); // store ports in properties
-      installation.setManagerFeedback(sb.toString());
+      installation.setProperties(sb.toString());
     }
   }
 
