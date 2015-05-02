@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -13,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.ubicollab.ubibazaar.core.Device;
 import org.ubicollab.ubibazaar.core.Installation;
 import org.ubicollab.ubibazaar.core.Manager;
@@ -20,13 +22,16 @@ import org.ubicollab.ubibazaar.core.Manager;
 @Slf4j
 public class ApiClient {
 
+  private Client client;
+
   private String serverAddress;
   private String managerId;
+  private String managerKey;
 
   protected Manager getManagerInfo() {
-    WebTarget target = ClientBuilder.newClient()
+    WebTarget target = client
         .target(serverAddress)
-        .path("/resources/manager/")
+        .path("resources/managers")
         .path(managerId);
 
     return target
@@ -34,11 +39,24 @@ public class ApiClient {
         .get(Manager.class);
   }
 
+  protected void activateManager(Manager manager) {
+    // set flag to true
+    manager.setInstalled(true);
+
+    // let api know
+    client
+        .target(serverAddress)
+        .path("resources/managers")
+        .path(manager.getId())
+        .request()
+        .put(Entity.entity(manager, MediaType.APPLICATION_JSON));
+  }
+
 
   protected Set<Installation> findInstallationsForDevice(Device device) {
-    WebTarget target = ClientBuilder.newClient()
+    WebTarget target = client
         .target(serverAddress)
-        .path("/resources/installation")
+        .path("resources/installations")
         .path("query")
         .queryParam("device", device.getId());
 
@@ -47,18 +65,18 @@ public class ApiClient {
         .get(new GenericType<Set<Installation>>() {});
   }
 
-  protected Installation updateInstallation(Installation installation) {
-    return ClientBuilder.newClient()
+  protected void updateInstallation(Installation installation) {
+    client
         .target(serverAddress)
-        .path("/resources/installation")
+        .path("resources/installations")
+        .path(installation.getId())
         .request()
-        .post(Entity.entity(installation, MediaType.APPLICATION_JSON), Installation.class);
+        .put(Entity.entity(installation, MediaType.APPLICATION_JSON));
   }
-
 
   protected void setUp() throws IOException {
     Properties prop = new Properties();
-    InputStream in = Ahab.class.getResourceAsStream("/api.properties");
+    InputStream in = Ahab.class.getResourceAsStream("/manager.properties");
     prop.load(in);
     in.close();
 
@@ -66,8 +84,18 @@ public class ApiClient {
     serverAddress = prop.getProperty("server_address");
     log.info("Using API on " + serverAddress);
 
-    managerId = prop.getProperty("manager_uuid");
+    managerId = prop.getProperty("manager_id");
+    managerKey = prop.getProperty("manager_key");
     log.info("This is manager " + managerId);
+
+    // set up authentication feaure
+    HttpAuthenticationFeature authFeature = HttpAuthenticationFeature.basicBuilder()
+        .nonPreemptive()
+        .credentials(managerId, managerKey)
+        .build();
+
+    // create client with auth feature
+    client = ClientBuilder.newClient().register(authFeature);
   }
 
 }

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.ubicollab.ubibazaar.core.Installation;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.spotify.docker.client.DefaultDockerClient;
@@ -110,14 +111,17 @@ public class DockerWrapper {
 
       // start the container
       docker.startContainer(creation.id(), hostConfig);
-
+      
       // set manager feedback
       StringBuffer sb = new StringBuffer();
       docker.listContainers(ListContainersParam.allContainers()).stream()
           .filter(c -> c.id().equals(creation.id())) // find container
           .flatMap(c -> c.ports().stream()) // find exposed ports
           .forEach(p -> sb.append(p.toString())); // store ports in properties
-      installation.setProperties(sb.toString());
+      
+      Map<String, String> installationProps = Maps.newHashMap();
+      installationProps.put("ports", sb.toString());
+      installation.setProperties(new Gson().toJson(installationProps));
     }
   }
 

@@ -23,7 +23,13 @@ public class Ahab implements Runnable {
 
       // look up manager info
       Manager manager = api.getManagerInfo();
+      
+      // if this is the first time after installation, activate
+      if(!manager.getInstalled()) {
+        api.activateManager(manager);
+      }
 
+      // manage devices
       for (Device device : manager.getDevices()) {
         try {
           // processing device
