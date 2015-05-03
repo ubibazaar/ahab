@@ -23,10 +23,16 @@ import org.ubicollab.ubibazaar.core.Manager;
 public class ApiClient {
 
   private Client client;
-
   private String serverAddress;
-  private String managerId;
-  private String managerKey;
+
+  private final String managerId;
+  private final String managerKey;
+
+  public ApiClient(String managerId, String managerKey) {
+    super();
+    this.managerId = managerId;
+    this.managerKey = managerKey;
+  }
 
   protected Manager getManagerInfo() {
     WebTarget target = client
@@ -83,10 +89,6 @@ public class ApiClient {
     // server address
     serverAddress = prop.getProperty("server_address");
     log.info("Using API on " + serverAddress);
-
-    managerId = prop.getProperty("manager_id");
-    managerKey = prop.getProperty("manager_key");
-    log.info("This is manager " + managerId);
 
     // set up authentication feaure
     HttpAuthenticationFeature authFeature = HttpAuthenticationFeature.basicBuilder()

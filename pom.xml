@@ -3,8 +3,18 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.ubicollab</groupId>
 	<artifactId>ubibazaar-ahab</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1</version>
 	<name>Ahab - UbiBazaar Client</name>
+	<organization>
+		<name>UbiBazaar</name>
+		<url>https://github.com/ubibazaar</url>
+	</organization>
+	<developers>
+		<developer>
+			<name>Simon Stastny</name>
+			<email>stastny.simon@gmail.com</email>
+		</developer>
+	</developers>
 	<dependencies>
 		<dependency>
 			<groupId>com.spotify</groupId>
@@ -53,6 +63,11 @@
 			<artifactId>logback-classic</artifactId>
 			<version>1.0.13</version>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.12</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -64,6 +79,34 @@
 					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.5</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>org.ubicollab.ubibazaar.client.ahab.Main</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

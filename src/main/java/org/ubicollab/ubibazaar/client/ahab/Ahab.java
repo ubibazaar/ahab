@@ -10,12 +10,21 @@ import org.ubicollab.ubibazaar.core.Manager;
 
 @Slf4j
 public class Ahab implements Runnable {
+  
+  private final String managerId;
+  private final String managerKey;
+  
+  public Ahab(String managerId, String managerKey) {
+    super();
+    this.managerId = managerId;
+    this.managerKey = managerKey;
+  }
 
   @Override
   public void run() {
     try {
       // set up api client
-      ApiClient api = new ApiClient();
+      ApiClient api = new ApiClient(managerId, managerKey);
       api.setUp();
 
       // set up docker wrapper
